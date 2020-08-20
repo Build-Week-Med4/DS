@@ -1,6 +1,11 @@
 # DS Flask API
 - A FLASK web application that returns the Effect and Flavor request with a recommendation for a strain of Cannabis to try. 
 
+# Setup
+```py
+FLASK_APP=app.py flask run
+```
+
 # Example 
 ```
 {
