@@ -20,7 +20,7 @@ def create_app():
 
 app = create_app()
 db = SQLAlchemy(app)
-Migrate(app,db) # migrate = 
+Migrate(app,db)
 
 
 
@@ -49,8 +49,6 @@ class UserStrain(db.Model):
     def __repr__(self):
         return f'ID = {self.id} Strain = {self.strain}' #Type = {self.type} Rating = {self.rating} Effects = {self.effects} Flavor = {self.flavor} Description = {self.description}'
 
-db.drop_all()
-db.create_all()
 
 
 
