@@ -11,12 +11,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 
+def create_app():
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cannabis.db"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
+    app = Flask(__name__)
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cannabis.db"
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
+    return app
+
+app = create_app()
 db = SQLAlchemy(app)
-migrate = Migrate(app,db)
+Migrate(app,db) # migrate = 
+
 
 
 class Strain(db.Model):
@@ -156,10 +161,36 @@ def predict():
 
     return jsonify(recommendation_dictionaries)
 
+@app.route('/predict_medical')#, methods = ['GET','POST'])
+
+def predict_medical():
+    #Load Model
+    # KNN_FILEPATH = 'machine_learning/knn_medical.pkl'
+    # print("LOADING THE MODEL...")
+    # with open(KNN_FILEPATH, "rb") as model_file:
+    #     saved_model = pickle.load(model_file)
+
+    # CONDITION_FILEPATH = 'machine_learning/conditions.pkl'
+    # print("LOADING CONDITIONS...")
+    # with open(CONDITIONS_FILEPATH, "rb") as conditions_file:
+    #     conditions = pickle.load(conditions_file)
+
+    # payload = request.get_json() or request.args 
+    # c = payload['condition']
+    # condition = conditions[c]
+
+    # # TO DO MODEL USE CASE 
+
+
+
+    
+
+    return 'TODO conditions.pkl, knn_medical.pkl'
+
 @app.route('/predict_sentence')
 
 def predict_sentence():
-    return 'TODO GET KNN_MODEL2.PKL'
+    return 'TODO GET knn_model2.pkl'
 
 #     payload = request.get_json() or request.args 
 #     text = payload['text']
