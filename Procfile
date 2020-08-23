@@ -1,1 +1,1 @@
-web: gunicorn "DS:app.py"
+web: gunicorn "app.py:create_app()"
