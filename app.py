@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cannabis.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
     
-
+# Databse Creation
 db = SQLAlchemy(app)
 Migrate(app,db)
 
@@ -69,7 +69,7 @@ for i in range(0,len(df)):
 
 
 
-
+# Creating Routes
 
 @app.route('/')
 def index():
@@ -216,9 +216,9 @@ def predict_sentence():
 #         info_description = df.loc[temp_df[0][i]]['description']
 #         info_rating = df.loc[temp_df[0][i]]['rating']
 
-#     my_dict = {'strain':info,'effects':info_effects,'flavor':info_flavor,'description':info_description, 'rating':info_rating}
+#     recommendation = jsonify({'strain':info,'effects':info_effects,'flavor':info_flavor,'description':info_description, 'rating':info_rating})
 
-#     return jsonify(my_dict)
+#     return recommendation
      
 
 
