@@ -54,6 +54,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, "cannabis.db")
 DF_FILEPATH = 'cannabis_.csv'
 df = pd.read_csv(DF_FILEPATH)
+DF_FILEPATH_2 = 'machine_learning/medical.csv'
+df2 = pd.read_csv(DF_FILEPATH_2)
 
 for i in range(0,len(df)):
     in_q = df.iloc[i][0]
@@ -180,12 +182,12 @@ def predict_medical():
     temp_df = saved_model.kneighbors(conditions.transform([c]).todense())[1]
 
     for i in range(4):
-        info = df.loc[temp_df[0][i]]['Strain']
-        info_effects = df.loc[temp_df[0][i]]['Effects']
-        info_flavor = df.loc[temp_df[0][i]]['Flavor']
-        info_description = df.loc[temp_df[0][i]]['Description']
-        info_rating = df.loc[temp_df[0][i]]['Rating']
-        info_ailments = df.loc[temp_df[0][i]]['ailments']
+        info = df2.loc[temp_df[0][i]]['Strain']
+        info_effects = df2.loc[temp_df[0][i]]['Effects']
+        info_flavor = df2.loc[temp_df[0][i]]['Flavor']
+        info_description = df2.loc[temp_df[0][i]]['Description']
+        info_rating = df2.loc[temp_df[0][i]]['Rating']
+        info_ailments = df2.loc[temp_df[0][i]]['alments']
         print(json.dumps(info))
         print(json.dumps(info_ailments))
         print(json.dumps(info_effects))
@@ -198,7 +200,8 @@ def predict_medical():
                         'effects':info_effects,
                         'flavor':info_flavor,
                         'description':info_description, 
-                        'rating':info_rating
+                        'rating':info_rating,
+                        'ailment':info_ailments
                     }
 
     return jsonify(recommendation)
