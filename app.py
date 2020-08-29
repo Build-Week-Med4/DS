@@ -6,14 +6,17 @@ import pickle
 
 import pandas as pd
 from flask import Flask, jsonify, request, Blueprint
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 
 # Create_app
 app = Flask(__name__)
+CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cannabis.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
+
     
 # Databse Creation
 db = SQLAlchemy(app)
@@ -73,12 +76,14 @@ for i in range(0,len(df)):
 # Creating Routes
 
 @app.route('/')
+
 def index():
     print('Visiting Home Page')
     return'HELLO_WORLD'
 
 
 @app.route('/trending')
+
 def trending():
     print('visitng home page')
     connection = sqlite3.connect(db_path)
@@ -100,6 +105,7 @@ def trending():
 
 
 @app.route('/predict', methods = ['GET','POST'])
+
 
 def predict():
     '''
