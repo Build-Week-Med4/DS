@@ -1,6 +1,5 @@
 import os
-
-
+import json
 import sqlite3
 import pickle
 
@@ -55,6 +54,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, "cannabis.db")
 DF_FILEPATH = 'cannabis_.csv'
 df = pd.read_csv(DF_FILEPATH)
+DF_FILEPATH_2 = 'machine_learning/medical.csv'
+df2 = pd.read_csv(DF_FILEPATH_2)
 
 for i in range(0,len(df)):
     in_q = df.iloc[i][0]
@@ -160,31 +161,52 @@ def predict():
 
     return jsonify(recommendation_dictionaries)
 
-@app.route('/predict_medical')#, methods = ['GET','POST'])
+@app.route('/predict_medical', methods = ['GET','POST'])
 
 def predict_medical():
-    #Load Model
-    # KNN_FILEPATH = 'machine_learning/knn_medical.pkl'
-    # print("LOADING THE MODEL...")
-    # with open(KNN_FILEPATH, "rb") as model_file:
-    #     saved_model = pickle.load(model_file)
+    # Load Model
+    MODEL_FILEPATH = 'machine_learning/ailments_model.pkl2'
+    print("LOADING THE MODEL...")
+    with open(MODEL_FILEPATH, "rb") as model_file:
+         saved_model = pickle.load(model_file)
 
-    # CONDITION_FILEPATH = 'machine_learning/conditions.pkl'
-    # print("LOADING CONDITIONS...")
-    # with open(CONDITIONS_FILEPATH, "rb") as conditions_file:
-    #     conditions = pickle.load(conditions_file)
+    CONDITION_FILEPATH = 'machine_learning/ailments_tfidf.pkl2'
+    print("LOADING CONDITIONS...")
+    with open(CONDITION_FILEPATH, "rb") as conditions_file:
+         conditions = pickle.load(conditions_file)
 
-    # payload = request.get_json() or request.args 
-    # c = payload['condition']
-    # condition = conditions[c]
+    payload = request.get_json() or request.args 
+    c = payload['condition']
 
-    # # TO DO MODEL USE CASE 
+    # # Run knn model using query vector. Needs to be reshaped
+    temp_df = saved_model.kneighbors(conditions.transform([c]).todense())[1]
 
+    for i in range(4):
+        info = df2.loc[temp_df[0][i]]['Strain']
+        info_effects = df2.loc[temp_df[0][i]]['Effects']
+        info_flavor = df2.loc[temp_df[0][i]]['Flavor']
+        info_description = df2.loc[temp_df[0][i]]['Description']
+        info_rating = df2.loc[temp_df[0][i]]['Rating']
+        info_ailments = df2.loc[temp_df[0][i]]['alments']
+        print(json.dumps(info))
+        print(json.dumps(info_ailments))
+        print(json.dumps(info_effects))
+        print(json.dumps(info_flavor))
+        print(json.dumps(info_description))
+        print(json.dumps(info_rating))
 
+    recommendation = {  
+                        'strain':info,
+                        'effects':info_effects,
+                        'flavor':info_flavor,
+                        'description':info_description, 
+                        'rating':info_rating,
+                        'ailment':info_ailments
+                    }
+
+    return jsonify(recommendation)
 
     
-
-    return 'TODO conditions.pkl, knn_medical.pkl'
 
 @app.route('/predict_sentence')
 
@@ -208,7 +230,6 @@ def predict_sentence():
 
 #     temp_df = saved_model_2.kneighbors(saved_model.transform([text]).todense())[1]
     
-
 #     for i in range(4):
 #         info = df.loc[temp_df[0][i]]['strain']
 #         info_effects = df.loc[temp_df[0][i]]['effects']

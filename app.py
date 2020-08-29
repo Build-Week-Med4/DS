@@ -1,6 +1,5 @@
 import os
-
-
+import json
 import sqlite3
 import pickle
 
@@ -55,6 +54,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, "cannabis.db")
 DF_FILEPATH = 'cannabis_.csv'
 df = pd.read_csv(DF_FILEPATH)
+DF_FILEPATH_2 = 'machine_learning/medical.csv'
+df2 = pd.read_csv(DF_FILEPATH_2)
 
 for i in range(0,len(df)):
     in_q = df.iloc[i][0]
@@ -104,7 +105,6 @@ def predict():
     '''
     Returns a JSON object of the recommended strain information 
     calculated from a users flavor and effect. 
-
     '''
     ### Load Files
     #Load Model
@@ -160,48 +160,52 @@ def predict():
 
     return jsonify(recommendation_dictionaries)
 
-@app.route('/predict_medical')#, methods = ['GET','POST'])
+@app.route('/predict_medical', methods = ['GET','POST'])
 
 def predict_medical():
-    #Load Model
+    # Load Model
     MODEL_FILEPATH = 'machine_learning/ailments_model.pkl2'
     print("LOADING THE MODEL...")
     with open(MODEL_FILEPATH, "rb") as model_file:
-        saved_model = pickle.load(model_file)
-    
-    temp_alments = ['multiple-sclerosis',
-                    'seizures','muscular-dystrophy', 
-                    'muscle-spasms', 'gastrointestinal-disorder', 
-                    'lack-of-appetite', 'spasticity', 'bipolar-disorder', 
-                    'parkinsons', 'phantom-limb-pain', 'spinal-cord-injury', 
-                    'cancer', 'fibromyalgia', 'epilepsy', 'anorexia', 
-                    'add-adhd', 'anxiety', 'ptsd', 'pms', 'tinnitus', 
-                    'tourettes-syndrome', 'eye-pressure', 'migraines', 
-                    'hypertension', 'crohns-disease', 'insomnia', 'hiv-aids', 
-                    'asthma', 'headaches', 'cramps', 'stress', 'inflammation', 
-                    'depression', 'cachexia', 'arthritis', 'glaucoma', 'nausea', 
-                    'alzheimers', 'fatigue', 'pain']
+         saved_model = pickle.load(model_file)
 
-    # CONDITION_FILEPATH = 'machine_learning/conditions.pkl'
-    # print("LOADING CONDITIONS...")
-    # with open(CONDITIONS_FILEPATH, "rb") as conditions_file:
-    #     conditions = pickle.load(conditions_file)
+    CONDITION_FILEPATH = 'machine_learning/ailments_tfidf.pkl2'
+    print("LOADING CONDITIONS...")
+    with open(CONDITION_FILEPATH, "rb") as conditions_file:
+         conditions = pickle.load(conditions_file)
 
     payload = request.get_json() or request.args 
     c = payload['condition']
-    condition = temp_alments[1] #conditions[c]
 
+    # # Run knn model using query vector. Needs to be reshaped
+    temp_df = saved_model.kneighbors(conditions.transform([c]).todense())[1]
 
+    for i in range(4):
+        info = df2.loc[temp_df[0][i]]['Strain']
+        info_effects = df2.loc[temp_df[0][i]]['Effects']
+        info_flavor = df2.loc[temp_df[0][i]]['Flavor']
+        info_description = df2.loc[temp_df[0][i]]['Description']
+        info_rating = df2.loc[temp_df[0][i]]['Rating']
+        info_ailments = df2.loc[temp_df[0][i]]['alments']
+        print(json.dumps(info))
+        print(json.dumps(info_ailments))
+        print(json.dumps(info_effects))
+        print(json.dumps(info_flavor))
+        print(json.dumps(info_description))
+        print(json.dumps(info_rating))
 
-    # TO DO MODEL USE CASE 
+    recommendation = {  
+                        'strain':info,
+                        'effects':info_effects,
+                        'flavor':info_flavor,
+                        'description':info_description, 
+                        'rating':info_rating,
+                        'ailment':info_ailments
+                    }
 
-
-
-
+    return jsonify(recommendation)
 
     
-
-    return 'TODO conditions.pkl, knn_medical.pkl'
 
 @app.route('/predict_sentence')
 
@@ -211,30 +215,30 @@ def predict_sentence():
 #     payload = request.get_json() or request.args 
 #     text = payload['text']
 
-    # #Load Model
-    # MODEL_FILEPATH = 'machine_learning/tfidf.pkl2'
-    # print("LOADING THE MODEL...")
-    # with open(MODEL_FILEPATH, "rb") as model_file:
-    #     saved_model = pickle.load(model_file)
+#     #Load Model
+#     MODEL_FILEPATH = 'machine_learning/knn.pkl'
+#     print("LOADING THE MODEL...")
+#     with open(MODEL_FILEPATH, "rb") as model_file:
+#         saved_model = pickle.load(model_file)
 
-    # MODEL_2_FILEPATH = 'machine_learning/model.pkl2'
-    # print("LOADING THE MODEL...")
-    # with open(MODEL_2_FILEPATH, "rb") as model_2_file:
-    #     saved_model_2 = pickle.load(model_2_file)
+#     MODEL_2_FILEPATH = 'machine_learning/knn.pkl'
+#     print("LOADING THE MODEL...")
+#     with open(MODEL_2_FILEPATH, "rb") as model_2_file:
+#         saved_model_2 = pickle.load(model_2_file)
 
 
-    # temp_df = saved_model_2.kneighbors(saved_model.transform([text]).todense())[1]
+#     temp_df = saved_model_2.kneighbors(saved_model.transform([text]).todense())[1]
     
+#     for i in range(4):
+#         info = df.loc[temp_df[0][i]]['strain']
+#         info_effects = df.loc[temp_df[0][i]]['effects']
+#         info_flavor = df.loc[temp_df[0][i]]['flavor']
+#         info_description = df.loc[temp_df[0][i]]['description']
+#         info_rating = df.loc[temp_df[0][i]]['rating']
 
-    # for i in range(4):
-    #     info = df.loc[temp_df[0][i]]['strain']
-    #     info_effects = df.loc[temp_df[0][i]]['effects']
-    #     info_flavor = df.loc[temp_df[0][i]]['flavor']
-    #     info_description = df.loc[temp_df[0][i]]['description']
-    #     info_rating = df.loc[temp_df[0][i]]['rating']
+#     recommendation = jsonify({'strain':info,'effects':info_effects,'flavor':info_flavor,'description':info_description, 'rating':info_rating})
 
-    # recommendation = jsonify({'strain':info,'effects':info_effects,'flavor':info_flavor,'description':info_description, 'rating':info_rating})
-
+#     return recommendation
      
 
 
